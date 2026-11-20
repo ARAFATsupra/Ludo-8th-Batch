@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUDO 8th Batch</title>
+  <meta name="description" content="Roll the Dice. Complete the Challenge. Enjoy Together!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/board.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<!-- SCREEN: WELCOME -->
+<div id="screen-welcome" class="screen">
+  <canvas id="particles-canvas"></canvas>
+  <div class="welcome-content">
+    <h1 class="logo">LUDO <span class="accent">8th Batch</span></h1>
+    <p class="tagline">Roll the Dice. Complete the Challenge. Enjoy Together!</p>
+    <div class="welcome-buttons">
+      <button id="btn-play" class="btn btn-primary btn-lg"><i data-lucide="play"></i> PLAY NOW</button>
+      <button id="btn-how-to-play" class="btn btn-secondary btn-lg"><i data-lucide="help-circle"></i> HOW TO PLAY</button>
+      <button id="btn-settings-welcome" class="btn btn-ghost" aria-label="Settings"><i data-lucide="settings"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: REGISTRATION -->
+<div id="screen-registration" class="screen hidden">
+  <div class="registration-card glass">
+    <button class="back-btn" data-nav="welcome" aria-label="Back"><i data-lucide="arrow-left"></i></button>
+    <h2>Join the Game</h2>
+    <form id="registration-form">
+      <div class="form-group">
+        <label for="player-name">Display Name</label>
+        <input id="player-name" type="text" minlength="3" maxlength="20" required placeholder="Your name" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Color</label>
+        <div id="color-picker" class="color-picker"></div>
+      </div>
+      <div class="form-group">
+        <label>Avatar</label>
+        <div id="avatar-picker" class="avatar-picker"></div>
+      </div>
+      <div class="form-group">
+        <label>Room Action</label>
+        <div class="room-toggle">
+          <button type="button" class="toggle-btn active" data-action="create">Create Room</button>
+          <button type="button" class="toggle-btn" data-action="join">Join Room</button>
+        </div>
+      </div>
+      <div class="form-group hidden" id="join-code-group">
+        <label for="room-code">Room Code</label>
+        <input id="room-code" type="text" maxlength="6" placeholder="ABC123">
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">
+        <i data-lucide="door-open"></i> <span id="submit-label">Create Room</span>
+      </button>
+      <p id="registration-error" class="error-text hidden"></p>
+    </form>
+  </div>
+</div>
+
+<!-- SCREEN: WAITING ROOM -->
+<div id="screen-waiting" class="screen hidden">
+  <div class="waiting-header glass">
+    <div class="room-info">
+      <span class="room-label">ROOM CODE</span>
+      <div class="room-code-display">
+        <span id="waiting-room-code" class="room-code">------</span>
+        <button id="btn-copy-code" class="icon-btn" aria-label="Copy"><i data-lucide="copy"></i></button>
+      </div>
+    </div>
+    <div class="waiting-actions">
+      <button id="btn-ready" class="btn btn-secondary"><i data-lucide="check-circle"></i> READY</button>
+      <button id="btn-start-game" class="btn btn-primary hidden"><i data-lucide="play"></i> START GAME</button>
+      <button id="btn-leave-waiting" class="btn btn-ghost" aria-label="Leave"><i data-lucide="log-out"></i></button>
+    </div>
+  </div>
+  <div class="waiting-body">
+    <h3>Players <span id="player-count">(0/28)</span></h3>
+    <div id="players-grid" class="players-grid"></div>
+  </div>
+</div>
+
+<!-- SCREEN: GAME -->
+<div id="screen-game" class="screen hidden">
+  <div class="game-layout">
+    <aside id="game-sidebar-left" class="game-sidebar">
+      <div class="sidebar-header">
+        <h4>Players</h4>
+        <span id="move-counter-badge" class="badge">Move 0</span>
+      </div>
+      <div id="game-player-list" class="player-list"></div>
+    </aside>
+    <main class="game-main">
+      <div class="game-top-bar">
+        <div class="turn-info">
+          <span class="turn-label">Current Turn</span>
+          <span id="current-turn-name" class="turn-name">—</span>
+        </div>
+        <div class="timer"><i data-lucide="timer"></i><span id="turn-timer">45</span>s</div>
+        <div class="challenge-progress"><div id="challenge-progress-bar" class="challenge-progress-bar"></div></div>
+      </div>
+      <div class="board-wrap"><canvas id="game-board" class="game-board"></canvas></div>
+      <div class="dice-area">
+        <div id="dice-container" class="dice-container">
+          <div id="die1" class="die"><div class="die-face"></div></div>
+          <div id="die2" class="die"><div class="die-face"></div></div>
+        </div>
+        <div id="dice-total" class="dice-total"></div>
+        <button id="btn-roll" class="btn btn-primary btn-lg"><i data-lucide="dices"></i> ROLL DICE</button>
+      </div>
+    </main>
+    <aside id="game-sidebar-right" class="game-sidebar">
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="chat"><i data-lucide="message-circle"></i> Chat <span id="chat-unread" class="unread-badge hidden">0</span></button>
+        <button class="tab-btn" data-tab="leaderboard"><i data-lucide="trophy"></i> Ranks</button>
+      </div>
+      <div id="tab-chat" class="tab-panel active">
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <input id="chat-input" type="text" maxlength="200" placeholder="Type a message...">
+          <button id="btn-send-chat" class="icon-btn" aria-label="Send"><i data-lucide="send"></i></button>
+        </div>
+        <div class="reactions-row">
+          <button class="reaction-btn" data-reaction="applause" aria-label="Applause"><i data-lucide="hand"></i></button>
+          <button class="reaction-btn" data-reaction="like" aria-label="Like"><i data-lucide="thumbs-up"></i></button>
+          <button class="reaction-btn" data-reaction="celebrate" aria-label="Celebrate"><i data-lucide="party-popper"></i></button>
+          <button class="reaction-btn" data-reaction="surprise" aria-label="Surprise"><i data-lucide="zap"></i></button>
+          <button class="reaction-btn" data-reaction="laugh" aria-label="Laugh"><i data-lucide="laugh"></i></button>
+        </div>
+      </div>
+      <div id="tab-leaderboard" class="tab-panel">
+        <div id="leaderboard-list" class="leaderboard-list"></div>
+      </div>
+    </aside>
+  </div>
+  <div class="game-top-actions">
+    <button id="btn-sound" class="icon-btn" aria-label="Sound"><i data-lucide="volume-2"></i></button>
+    <button id="btn-menu" class="icon-btn" aria-label="Menu"><i data-lucide="menu"></i></button>
+  </div>
+  <nav class="mobile-nav">
+    <button class="nav-btn active" data-mobile-nav="board"><i data-lucide="grid-3x3"></i></button>
+    <button class="nav-btn" data-mobile-nav="chat"><i data-lucide="message-circle"></i></button>
+    <button class="nav-btn" data-mobile-nav="players"><i data-lucide="users"></i></button>
+    <button class="nav-btn" data-mobile-nav="menu"><i data-lucide="menu"></i></button>
+  </nav>
+</div>
+
+<!-- CHALLENGE OVERLAY -->
+<div id="challenge-overlay" class="challenge-overlay hidden">
+  <div class="challenge-card glass">
+    <div class="challenge-header">
+      <span id="challenge-category" class="category-badge">Category</span>
+      <div class="challenge-timer"><i data-lucide="timer"></i> <span id="challenge-timer">90</span>s</div>
+    </div>
+    <div class="challenge-player">
+      <div id="challenge-avatar" class="challenge-avatar"></div>
+      <span id="challenge-player-name" class="challenge-player-name">Player</span>
+    </div>
+    <p id="challenge-text" class="challenge-text"></p>
+    <div id="challenge-actions-self" class="challenge-actions hidden">
+      <button id="btn-challenge-complete" class="btn btn-primary btn-lg"><i data-lucide="check"></i> TASK COMPLETED</button>
+      <button id="btn-challenge-skip" class="btn btn-secondary btn-lg"><i data-lucide="skip-forward"></i> SKIP TASK</button>
+    </div>
+    <div id="challenge-actions-others" class="challenge-actions">
+      <p class="waiting-text">Waiting for <span id="challenge-wait-name">player</span>...</p>
+    </div>
+  </div>
+</div>
+
+<!-- WINNER OVERLAY -->
+<div id="winner-overlay" class="winner-overlay hidden">
+  <div class="winner-card glass">
+    <h2 class="winner-title">WINNER!</h2>
+    <div id="winner-avatar" class="winner-avatar"></div>
+    <p id="winner-name" class="winner-name">Player</p>
+    <div id="winner-stats" class="winner-stats"></div>
+    <button id="btn-play-again" class="btn btn-primary btn-lg hidden"><i data-lucide="rotate-ccw"></i> PLAY AGAIN</button>
+    <button id="btn-leave-winner" class="btn btn-ghost"><i data-lucide="log-out"></i> Leave</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" class="modal hidden">
+  <div class="modal-card glass">
+    <h3>Settings</h3>
+    <div class="settings-row"><label><i data-lucide="volume-x"></i> Master Mute</label><input id="setting-mute" type="checkbox"></div>
+    <div class="settings-row"><label><i data-lucide="music"></i> Music</label><input id="setting-music" type="range" min="0" max="100" value="30"></div>
+    <div class="settings-row"><label><i data-lucide="volume-2"></i> SFX</label><input id="setting-sfx" type="range" min="0" max="100" value="70"></div>
+    <button id="btn-close-settings" class="btn btn-primary btn-block">Close</button>
+  </div>
+</div>
+
+<!-- HOW TO PLAY MODAL -->
+<div id="how-to-play-modal" class="modal hidden">
+  <div class="modal-card glass">
+    <h3>How to Play</h3>
+    <div class="htp-content">
+      <p><strong>Goal:</strong> Be the first to bring all 4 tokens to the goal.</p>
+      <p><strong>Starting:</strong> Roll a combined 7 or doubles to leave home base.</p>
+      <p><strong>Movement:</strong> Move one token by the two-dice total. Doubles grant an extra roll.</p>
+      <p><strong>Captures:</strong> Land on an opponent to send them home. Safe zones protect tokens.</p>
+      <p><strong>Challenges:</strong> Every 10 moves a random player gets a skippable challenge. Never mandatory.</p>
+      <p><strong>Win:</strong> First to get all 4 tokens to goal wins!</p>
+    </div>
+    <button id="btn-close-htp" class="btn btn-primary btn-block">Got it</button>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<div id="reactions-layer" class="reactions-layer"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>
